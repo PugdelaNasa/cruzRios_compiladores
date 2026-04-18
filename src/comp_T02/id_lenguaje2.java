@@ -4,52 +4,91 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.*;
 import java.awt.*;
-/*
------------Programa 2 -----------------------------------
-Version 1 de AFD *aa* con alfabeto ab
-*/
-
 import java.io.*;
 
 public class id_lenguaje2 extends JFrame {
 
     private final JTextPane cuadroSuperior;
+    private JTextField campoCadena;
+    private JLabel resultadoEvaluacion;
 
     public id_lenguaje2() {
         setTitle("Ventana");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(360, 400);
+        setSize(550, 760);
         setLocationRelativeTo(null);
         setResizable(false);
 
         JPanel contenido = new JPanel();
         contenido.setLayout(new BoxLayout(contenido, BoxLayout.Y_AXIS));
-        contenido.setBorder(new EmptyBorder(20, 20, 20, 20));
+        contenido.setBorder(new EmptyBorder(25, 25, 25, 25));
         contenido.setBackground(new Color(245, 245, 245));
 
-        JLabel titulo = new JLabel(" AFD *aa* con alfabeto ab ");
+        JLabel titulo = new JLabel("AFD *aa* con alfabeto ab");
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titulo.setFont(new Font("SansSerif", Font.BOLD, 16));
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titulo.setForeground(new Color(40, 40, 40));
 
         cuadroSuperior = new JTextPane();
         cuadroSuperior.setEditable(false);
+        cuadroSuperior.setFont(new Font("SansSerif", Font.PLAIN, 16));
         cuadroSuperior.setText("Aquí se mostrará el contenido del archivo .txt y mostrará línea por línea si es válido o inválido");
 
         JScrollPane scrollCuadroSuperior = new JScrollPane(cuadroSuperior);
-        scrollCuadroSuperior.setPreferredSize(new Dimension(300, 250));
-        scrollCuadroSuperior.setMaximumSize(new Dimension(300, 250));
-        scrollCuadroSuperior.setMinimumSize(new Dimension(300, 250));
+        scrollCuadroSuperior.setPreferredSize(new Dimension(470, 420));
+        scrollCuadroSuperior.setMaximumSize(new Dimension(470, 420));
+        scrollCuadroSuperior.setMinimumSize(new Dimension(470, 420));
 
         JButton botonSeleccionar = new JButton("Seleccionar archivo .txt");
         botonSeleccionar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botonSeleccionar.setFont(new Font("SansSerif", Font.BOLD, 14));
+        botonSeleccionar.setPreferredSize(new Dimension(220, 40));
+        botonSeleccionar.setMaximumSize(new Dimension(220, 40));
         botonSeleccionar.addActionListener(e -> cargarArchivoTxt());
 
-        contenido.add(titulo);
-        contenido.add(Box.createVerticalStrut(15));
-        contenido.add(scrollCuadroSuperior);
+        JPanel panelCadena = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        panelCadena.setOpaque(false);
+        panelCadena.setMaximumSize(new Dimension(470, 50));
+
+        JLabel etiquetaCadena = new JLabel("Cadena:");
+        etiquetaCadena.setFont(new Font("SansSerif", Font.BOLD, 16));
+
+        campoCadena = new JTextField();
+        campoCadena.setPreferredSize(new Dimension(235, 34));
+        campoCadena.setFont(new Font("SansSerif", Font.PLAIN, 15));
+
+        JButton botonProbar = new JButton("Probar cadena");
+        botonProbar.setFont(new Font("SansSerif", Font.BOLD, 14));
+        botonProbar.setPreferredSize(new Dimension(140, 34));
+        botonProbar.addActionListener(e -> probarCadenaManual());
+
+        panelCadena.add(etiquetaCadena);
+        panelCadena.add(campoCadena);
+        panelCadena.add(botonProbar);
+
+        JPanel panelResultado = new JPanel();
+        panelResultado.setOpaque(false);
+        panelResultado.setMaximumSize(new Dimension(470, 80));
+
+        resultadoEvaluacion = new JLabel("Sin evaluar", SwingConstants.CENTER);
+        resultadoEvaluacion.setOpaque(true);
+        resultadoEvaluacion.setBackground(new Color(245, 245, 245));
+        resultadoEvaluacion.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        resultadoEvaluacion.setFont(new Font("SansSerif", Font.BOLD, 18));
+        resultadoEvaluacion.setPreferredSize(new Dimension(210, 55));
+
+        panelResultado.add(resultadoEvaluacion);
+
         contenido.add(Box.createVerticalStrut(10));
-        contenido.add(botonSeleccionar);
+        contenido.add(titulo);
         contenido.add(Box.createVerticalStrut(20));
+        contenido.add(scrollCuadroSuperior);
+        contenido.add(Box.createVerticalStrut(18));
+        contenido.add(botonSeleccionar);
+        contenido.add(Box.createVerticalStrut(28));
+        contenido.add(panelCadena);
+        contenido.add(Box.createVerticalStrut(25));
+        contenido.add(panelResultado);
 
         setContentPane(contenido);
     }
@@ -95,6 +134,28 @@ public class id_lenguaje2 extends JFrame {
         }
     }
 
+    private void probarCadenaManual() {
+        String cadena = campoCadena.getText().trim();
+
+        if (cadena.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Escribe una cadena para evaluar.",
+                    "Campo vacío",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        boolean valida = validarCadena(cadena);
+
+        if (valida) {
+            resultadoEvaluacion.setText("VÁLIDO");
+            resultadoEvaluacion.setForeground(new Color(0, 130, 0));
+        } else {
+            resultadoEvaluacion.setText("INVÁLIDO");
+            resultadoEvaluacion.setForeground(Color.RED);
+        }
+    }
+
     private boolean validarCadena(String cadena) {
         try {
             if (cadena == null || cadena.isEmpty()) {
@@ -109,39 +170,32 @@ public class id_lenguaje2 extends JFrame {
                 switch (estado) {
 
                     case 0:
-                        // AQUÍ VA TU LÓGICA DEL id_lenguaje2
-                        // Ejemplo:
+                        // AQUÍ VA TU LÓGICA REAL DEL id_lenguaje2
                         if (simbolo == 'a') {
                             estado = 1;
-                        } else {
+                        }else if (simbolo == 'b') estado = 0;
+                        else {
                             throw new Exception("Error en estado 0");
                         }
                         break;
 
                     case 1:
-                        // AQUÍ VA TU LÓGICA
-                        if (simbolo == 'b') {
+                        if (simbolo == 'a') {
                             estado = 2;
+                        } else if (simbolo == 'b') {
+                            estado = 0;
                         } else {
                             throw new Exception("Error en estado 1");
                         }
                         break;
 
                     case 2:
-                        // AQUÍ VA TU LÓGICA
-                        if (simbolo == 'c') {
-                            estado = 3;
+                        if (simbolo == 'a') {
+                            estado = 2;
+                        } else if (simbolo == 'b') {
+                            estado = 0;
                         } else {
                             throw new Exception("Error en estado 2");
-                        }
-                        break;
-
-                    case 3:
-                        // AQUÍ VA TU LÓGICA
-                        if (simbolo == 'c') {
-                            estado = 3;
-                        } else {
-                            throw new Exception("Error en estado 3");
                         }
                         break;
 
@@ -150,8 +204,8 @@ public class id_lenguaje2 extends JFrame {
                 }
             }
 
-            // CAMBIA ESTE ESTADO FINAL SEGÚN TU AUTÓMATA
-            return estado == 3;
+            // CAMBIA EL ESTADO FINAL SEGÚN TU AUTÓMATA
+            return estado == 2;
 
         } catch (Exception e) {
             System.out.println("Rutina error: " + e.getMessage());
@@ -167,9 +221,11 @@ public class id_lenguaje2 extends JFrame {
 
         Style estiloValido = cuadroSuperior.addStyle("valido", null);
         StyleConstants.setForeground(estiloValido, new Color(0, 150, 0));
+        StyleConstants.setBold(estiloValido, true);
 
         Style estiloInvalido = cuadroSuperior.addStyle("invalido", null);
         StyleConstants.setForeground(estiloInvalido, Color.RED);
+        StyleConstants.setBold(estiloInvalido, true);
 
         try {
             doc.insertString(doc.getLength(), "Línea " + numLinea + ": " + linea + "    ", estiloNormal);
